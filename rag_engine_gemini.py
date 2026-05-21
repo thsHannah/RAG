@@ -61,7 +61,6 @@ def build_index(chunks: list[dict], model: SentenceTransformer) -> faiss.Index:
 
 
 # ── RAG 引擎主類別 ────
-# ── RAG 引擎主類別 ────
 class TaiwanFoodRAG:
     def __init__(self, api_key: Optional[str] = None):
         print("載入 Embedding 模型（首次需下載，約 400 MB）...")
@@ -85,7 +84,7 @@ class TaiwanFoodRAG:
         key = api_key or os.environ.get("GEMINI_API_KEY", "")
         if key:
             genai.configure(api_key=key)
-            self.client = genai.GenerativeModel("gemini-1.5-flash")
+            self.client = genai.GenerativeModel("gemini-2.5-flash")
         else:
             self.client = None
 

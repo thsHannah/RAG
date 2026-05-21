@@ -6,15 +6,15 @@ app.py
 
 import os
 import streamlit as st
-from rag_engine import TaiwanFoodRAG
+from rag_engine_gemini import TaiwanFoodRAG
 
-# ── 頁面設定 ──────────────────────────────────────────
+# ── 頁面設定 ─────
 st.set_page_config(
     page_title="台灣美食知識庫",
     layout="centered",
 )
 
-# ── 自訂 CSS ──────────────────────────────────────────
+# ── 自訂 CSS ────
 st.markdown("""
 <style>
     .main { background-color: #fffdf8; }
@@ -32,6 +32,7 @@ st.markdown("""
         margin: 12px 0;
         font-size: 15px;
         line-height: 1.7;
+        color: #333333;
     }
     .source-card {
         background: #f7f7f7;
@@ -55,28 +56,28 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── 標題 ─────────────────────────────────────────────
+# ── 標題 ─────
 st.title("台灣美食知識庫")
 st.markdown("**用 RAG 技術帶你探索台灣美食文化！**　問什麼都行，例如：")
 st.markdown("`珍珠奶茶是哪裡發明的？` ・ `台南有什麼特色小吃？` ・ `鹽酥雞怎麼做？`")
 st.divider()
 
-# ── Sidebar：API Key 設定 ─────────────────────────────
+# ── Sidebar：API Key 設定 ──────
 with st.sidebar:
-    st.header("⚙️設定")
+    st.header("設定")
     api_key_input = st.text_input(
-        "Anthropic API Key",
+        "Gemini API Key",
         type="password",
-        placeholder="sk-ant-...",
-        help="從 https://console.anthropic.com 取得你的 API Key"
+        placeholder="AIza...",
+        help="從 https://aistudio.google.com 取得你的 API Key"
     )
     st.markdown("---")
     st.markdown("### 關於此專案")
     st.markdown("""
     這是一個 **RAG（檢索增強生成）** 系統，結合：
-    - 🔍 **語義搜尋**（sentence-transformers）
+    - **語義搜尋**（sentence-transformers）
     - **向量資料庫**（FAISS）
-    - **AI 生成**（Claude API）
+    - **AI 生成**（Gemini API）
     
     知識庫涵蓋 **15 種台灣經典美食**，包含起源、做法、特色與推薦地點。
     """)
@@ -103,12 +104,13 @@ rag = load_rag(api_key_input)
 
 # 若 API key 更新，重新建立客戶端
 if api_key_input and rag.client is None:
-    import anthropic
-    rag.client = anthropic.Anthropic(api_key=api_key_input)
+    import google.generativeai as genai
+    genai.configure(api_key=api_key_input)
+    rag.client = genai.GenerativeModel("gemini-1.5-flash")
 
 # ── 問答介面 ──────────────────────────────────────────
 query = st.text_input(
-    "🔎 請輸入你的問題",
+    "請輸入你的問題",
     value=st.session_state.get("query_input", ""),
     placeholder="例如：小籠包要怎麼吃才正確？",
     key="main_query"
@@ -124,7 +126,7 @@ with col1:
 with col2:
     only_search = st.checkbox("僅顯示檢索結果（不使用 AI 生成）", value=False)
 
-# ── 執行查詢 ──────────────────────────────────────────
+# ── 執行查詢 ─────
 if search_btn and query.strip():
     with st.spinner("正在搜尋知識庫..."):
         chunks = rag.retrieve(query)
@@ -132,7 +134,7 @@ if search_btn and query.strip():
     if only_search or not api_key_input:
         st.subheader("相關段落")
         if not api_key_input:
-            st.info("提示：在左側輸入 API Key 即可獲得 AI 整合回答！")
+            st.info("提示：在左側輸入 Gemini API Key 即可獲得 AI 整合回答！")
         for i, chunk in enumerate(chunks, 1):
             score_pct = int(chunk["score"] * 100)
             st.markdown(f"""
@@ -163,13 +165,13 @@ if search_btn and query.strip():
 elif search_btn and not query.strip():
     st.warning("請輸入問題再查詢！")
 
-# ── 歷史紀錄 ───
+# ── 歷史紀錄 ─────
 if "history" not in st.session_state:
     st.session_state.history = []
 
 if search_btn and query.strip():
     st.session_state.history.insert(0, query)
-    st.session_state.history = st.session_state.history[:10]  # 只保留最近 10 筆
+    st.session_state.history = st.session_state.history[:10]
 
 if st.session_state.history:
     st.divider()
