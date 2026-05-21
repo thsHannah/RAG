@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+venv/
+.venv/
+
+# macOS
+.DS_Store
+
+# FAISS / cache
+data/faiss.index
+data/chunks.pkl
+
+# Environment variables
+.env
+
+# Streamlit
+.streamlit/
+.streamlit/secrets.toml
+
+# HuggingFace cache
+.cache/
+
+*.egg-info/
+dist/
