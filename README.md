@@ -5,9 +5,9 @@
 ## 功能
 
 -  **語義搜尋**：不用精確關鍵字，用自然語言問問題
--  **本地向量資料庫**：FAISS 高速相似度搜尋，完全離線
 -  **AI 整合回答**：Gemini API 整合參考資料生成自然回覆
--  **15 種台灣美食**：涵蓋小吃、飲料、正餐、甜品
+-  **本地向量資料庫**
+-  **15 種台灣美食**
 
 ## 架構
 
@@ -34,18 +34,18 @@ Google Gemini API             ← 生成自然語言回答
 
 ## Quick Start
 
-### 1. 安裝依賴
+### 1. 安裝虛擬環境
 
 ```bash
 # 建議使用虛擬環境
 python -m venv venv
 source venv/bin/activate        # macOS/Linux
-# 或 venv\Scripts\activate      # Windows
+# venv\Scripts\activate      # Windows
 
 pip install -r requirements.txt
 ```
 
-> 首次執行會自動下載 embedding 模型（約 400 MB），請確保網路連線。
+> 首次執行會自動下載 embedding 模型（約 400 MB）
 
 ### 2. 取得 Gemini API Key
 
